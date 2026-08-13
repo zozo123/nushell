@@ -1,0 +1,198 @@
+on:
+  push:
+    branches:
+      - 'nsc/**'
+  workflow_dispatch:
+
+name: nsc-windows-ci-flow
+
+permissions:
+  contents: read
+
+# Runs nushell's real Windows CI leg on a genuine GitHub-hosted Windows
+# machine, and dumps the complete toolchain inventory alongside it.
+#
+# Two purposes:
+#   1. Record exactly which dependencies a Windows nushell build consumes,
+#      so the same list can be checked against a Namespace runner.
+#   2. Validate the `shell: bash` fix applied to the cargo test step on
+#      test/incredibuild-runner-ci, which cannot be validated upstream
+#      because nushell gates fork workflow runs behind maintainer approval.
+
+env:
+  NU_LOG_LEVEL: DEBUG
+  NU_TEST_SKIP_DEPS_BUILD: true
+  CLIPPY_OPTIONS: "-D warnings"
+  NUSHELL_CARGO_PROFILE: ci
+  MAIN_OPTIONS: --workspace --all-targets
+  # aws-lc-sys prefers a detected NASM over its shipped prebuilt objects.
+  AWS_LC_SYS_PREBUILT_NASM: '1'
+
+jobs:
+  windows-ci-flow:
+    name: "nushell Windows CI (${{ matrix.host }})"
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [windows-latest]
+    runs-on: ${{ matrix.host }}
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Rust Toolchain
+        run: rustup target add x86_64-pc-windows-msvc
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        with:
+          workspaces: ./ -> target
+          cache-all-crates: true
+          cache-workspace-crates: true
+
+      # ---------- dependency inventory ----------
+
+      - name: "DEPS: machine, drives, runner"
+        shell: pwsh
+        run: |
+          "== machine =="
+          [System.Environment]::OSVersion.VersionString
+          "hostname=$(hostname)  user=$(whoami)"
+          "ImageOS=$env:ImageOS  ImageVersion=$env:ImageVersion"
+          "RUNNER_OS=$env:RUNNER_OS  ARCH=$env:RUNNER_ARCH"
+          "workspace=$env:GITHUB_WORKSPACE"
+          "temp=$env:RUNNER_TEMP  toolcache=$env:RUNNER_TOOL_CACHE"
+          "NSC_CACHE_PATH=$env:NSC_CACHE_PATH  (empty unless on Namespace)"
+          "== drives =="
+          Get-PSDrive -PSProvider FileSystem |
+            Select-Object Name,
+              @{n='UsedGB';e={[math]::Round($_.Used/1GB,1)}},
+              @{n='FreeGB';e={[math]::Round($_.Free/1GB,1)}} | Format-Table
+
+      - name: "DEPS: MSVC toolchain and Windows SDK"
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (-not (Test-Path $vswhere)) { throw "vswhere.exe missing" }
+          $inst = & $vswhere -latest -products * `
+                    -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+                    -property installationPath
+          $disp = & $vswhere -latest -products * -property displayName
+          $iver = & $vswhere -latest -products * -property installationVersion
+          "VS displayName        = $disp"
+          "VS installationVersion= $iver"
+          "VS installationPath   = $inst"
+          $ver = (Get-Content "$inst\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt").Trim()
+          "VCToolsVersion        = $ver"
+
+          $bin = "$inst\VC\Tools\MSVC\$ver\bin\HostX64\x64"
+          foreach ($t in 'cl.exe','link.exe','lib.exe','ml64.exe') {
+            if (Test-Path (Join-Path $bin $t)) { "OK   $t" } else { "MISS $t" }
+          }
+          & (Join-Path $bin 'cl.exe') 2>&1 | Select-Object -First 2
+
+          "== Windows SDK versions =="
+          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Lib" -Directory -EA SilentlyContinue |
+            ForEach-Object { "  SDK $($_.Name)" }
+
+          "== static CRT (nushell forces +crt-static) =="
+          foreach ($lib in 'libcmt.lib','libvcruntime.lib') {
+            $h = Get-ChildItem "$inst\VC\Tools\MSVC\$ver\lib\x64\$lib" -EA SilentlyContinue
+            if ($h) { "OK   $lib" } else { "MISS $lib" }
+          }
+          $u = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Lib\*\ucrt\x64\libucrt.lib" -EA SilentlyContinue
+          if ($u) { "OK   libucrt.lib" } else { "MISS libucrt.lib" }
+
+      - name: "DEPS: native build tools nushell crates need"
+        shell: pwsh
+        run: |
+          # ring, aws-lc-sys, libgit2-sys, libz-sys, lz4-sys, zstd-sys,
+          # curl-sys, libsqlite3-sys, lmdb-master-sys -> cc + cmake
+          # bindgen, clang-sys -> libclang
+          foreach ($t in 'cmake','ninja','clang','clang-cl','nasm','perl','go','python','node','git','rc') {
+            $c = Get-Command $t -EA SilentlyContinue
+            if ($c) {
+              $v = try { (& $t --version 2>&1 | Select-Object -First 1) } catch { '' }
+              "OK   {0,-10} {1,-58} {2}" -f $t, $c.Source, $v
+            } else { "MISS $t" }
+          }
+          foreach ($d in "${env:ProgramFiles}\LLVM\bin","${env:ProgramFiles(x86)}\LLVM\bin") {
+            if (Test-Path "$d\libclang.dll") { "OK   libclang.dll -> $d" }
+          }
+          "VCPKG_ROOT=$env:VCPKG_ROOT"
+          "== rust =="
+          rustup --version; rustup show; cargo --version; rustc --version; rustc --print cfg | Select-String crt
+
+      - name: "DEPS: native crates in the Windows graph"
+        shell: bash
+        run: |
+          cargo tree --target x86_64-pc-windows-msvc --edges normal,build --prefix none --workspace 2>/dev/null \
+            | awk '{print $1}' | sort -u > /tmp/win-deps.txt || true
+          echo "total unique crates: $(wc -l < /tmp/win-deps.txt)"
+          echo "--- native / build crates present ---"
+          grep -E '^(aws-lc-sys|ring|cc|cmake|bindgen|clang-sys|libgit2-sys|libsqlite3-sys|libz-sys|lz4-sys|zstd-sys|curl-sys|lmdb-master-sys|psm|nix|openssl-sys)$' /tmp/win-deps.txt || true
+
+      # ---------- the real CI flow, timed ----------
+
+      - name: cargo fmt
+        shell: bash
+        run: |
+          s=$(date +%s); rustup component add rustfmt
+          cargo fmt --all --check
+          echo "TIMING fmt = $(( $(date +%s) - s ))s"
+
+      - name: cargo clippy
+        shell: bash
+        run: |
+          s=$(date +%s); rustup component add clippy
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" clippy $MAIN_OPTIONS --profile ci -- $CLIPPY_OPTIONS
+          echo "TIMING clippy = $(( $(date +%s) - s ))s"
+
+      - name: cargo build
+        shell: bash
+        run: |
+          s=$(date +%s)
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" build $MAIN_OPTIONS --profile ci
+          echo "TIMING build = $(( $(date +%s) - s ))s"
+
+      # This mirrors the fixed step on test/incredibuild-runner-ci. Without
+      # `shell: bash` the body is handed to pwsh, which fails with
+      # "Missing '(' after 'if' in if statement".
+      - name: cargo test
+        shell: bash
+        run: |
+          s=$(date +%s)
+          if [ "${{ matrix.host }}" = "incredibuild-runner" ]; then
+            cargo --config "${{ github.workspace }}/.cargo/ci.toml" test --workspace --lib --tests --profile ci -- \
+              --skip plugin_process_exits_when_nushell_exits \
+              --skip mkdir_continues_creating_directories_after_error \
+              --skip cd_permission_denied_folder \
+              --skip rm_prints_filenames_on_error
+            cargo --config "${{ github.workspace }}/.cargo/ci.toml" test --workspace --benches --profile ci
+          else
+            cargo --config "${{ github.workspace }}/.cargo/ci.toml" test $MAIN_OPTIONS --profile ci
+          fi
+          echo "TIMING test = $(( $(date +%s) - s ))s"
+          echo "SHELL FIX VERIFIED: bash parsed the conditional"
+
+      - name: cargo test --doc
+        shell: bash
+        run: |
+          s=$(date +%s)
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" test --workspace --doc --profile ci
+          echo "TIMING doctest = $(( $(date +%s) - s ))s"
+
+      - name: Disk footprint
+        if: always()
+        shell: pwsh
+        run: |
+          Get-PSDrive -PSProvider FileSystem |
+            Select-Object Name,
+              @{n='UsedGB';e={[math]::Round($_.Used/1GB,1)}},
+              @{n='FreeGB';e={[math]::Round($_.Free/1GB,1)}} | Format-Table
+          if (Test-Path target) {
+            $b=(Get-ChildItem target -Recurse -Force -EA SilentlyContinue | Measure-Object Length -Sum).Sum
+            "target dir: $([math]::Round($b/1GB,2)) GB"
+          }
