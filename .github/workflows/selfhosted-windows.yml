@@ -1,0 +1,68 @@
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+name: selfhosted-windows
+
+permissions:
+  contents: read
+
+env:
+  NU_LOG_LEVEL: DEBUG
+  NU_TEST_SKIP_DEPS_BUILD: true
+  CLIPPY_OPTIONS: "-D warnings"
+  NUSHELL_CARGO_PROFILE: ci
+  MAIN_OPTIONS: --workspace --all-targets
+  # NASM is absent on the Namespace Windows image; aws-lc-sys falls back to
+  # its shipped prebuilt objects when this is set.
+  AWS_LC_SYS_PREBUILT_NASM: '1'
+
+jobs:
+  windows:
+    name: nushell Windows CI on Namespace
+    runs-on: [self-hosted, nsc-windows]
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Toolchain inventory
+        shell: pwsh
+        run: |
+          [System.Environment]::OSVersion.VersionString
+          "whoami=$(whoami)"
+          $vs = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $i  = & $vs -latest -products * -property installationPath
+          "VS=$(& $vs -latest -products * -property displayName)"
+          $v = (Get-Content "$i\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt").Trim()
+          "MSVC=$v"
+          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Lib" -Directory |
+            ForEach-Object { "SDK=$($_.Name)" }
+          foreach ($t in 'cl','link','cmake','ninja','clang','nasm','cargo','rustc') {
+            $c = Get-Command $t -EA SilentlyContinue
+            if ($c) { "OK   $t -> $($c.Source)" } else { "MISS $t" }
+          }
+
+      - name: Setup Rust target
+        run: rustup target add x86_64-pc-windows-msvc
+
+      - name: cargo build (timed)
+        shell: bash
+        run: |
+          s=$(date +%s)
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" build $MAIN_OPTIONS --profile ci
+          echo "TIMING build = $(( $(date +%s) - s ))s"
+
+      - name: cargo test (timed, validates shell fix)
+        shell: bash
+        run: |
+          s=$(date +%s)
+          if [ "runner" = "incredibuild-runner" ]; then
+            echo "ib branch"
+          else
+            cargo --config "${{ github.workspace }}/.cargo/ci.toml" test $MAIN_OPTIONS --profile ci
+          fi
+          echo "TIMING test = $(( $(date +%s) - s ))s"
+          echo "SHELL FIX VERIFIED"
