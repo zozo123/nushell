@@ -1,0 +1,128 @@
+on:
+  push:
+    branches:
+      - 'nsc/**'
+  workflow_dispatch:
+
+name: nsc-windows-probe
+
+permissions:
+  contents: read
+
+env:
+  NU_LOG_LEVEL: DEBUG
+  NU_TEST_SKIP_DEPS_BUILD: true
+  NUSHELL_CARGO_PROFILE: ci
+  # aws-lc-sys prefers a detected NASM over its shipped prebuilt objects.
+  # Namespace NASM state is unverified, so force the prebuilt path.
+  AWS_LC_SYS_PREBUILT_NASM: '1'
+
+jobs:
+  toolchain:
+    name: "toolchain (${{ matrix.host.name }})"
+    strategy:
+      fail-fast: false
+      matrix:
+        host:
+          - name: namespace
+            runs-on: nscloud-windows-2022-amd64-8x16
+          - name: github
+            runs-on: windows-latest
+
+    runs-on: ${{ matrix.host.runs-on }}
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Identity and drives
+        shell: pwsh
+        run: |
+          "runner.os=$env:RUNNER_OS arch=$env:RUNNER_ARCH"
+          "workspace=$env:GITHUB_WORKSPACE temp=$env:RUNNER_TEMP toolcache=$env:RUNNER_TOOL_CACHE"
+          [System.Environment]::OSVersion.VersionString
+          whoami
+          "NSC_CACHE_PATH=$env:NSC_CACHE_PATH"
+          Get-PSDrive -PSProvider FileSystem |
+            Select-Object Name,
+              @{n='UsedGB';e={[math]::Round($_.Used/1GB,1)}},
+              @{n='FreeGB';e={[math]::Round($_.Free/1GB,1)}} |
+            Format-Table
+
+      - name: MSVC, SDK and the static CRT
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (-not (Test-Path $vswhere)) { throw "vswhere.exe missing" }
+          $inst = & $vswhere -latest -products * `
+                    -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+                    -property installationPath
+          if (-not $inst) { throw "no VC.Tools.x86.x64 install found" }
+          "VS installationPath = $inst"
+          $ver = (Get-Content "$inst\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt").Trim()
+          "VCToolsVersion = $ver"
+
+          $bin = "$inst\VC\Tools\MSVC\$ver\bin\HostX64\x64"
+          foreach ($t in 'cl.exe','link.exe','lib.exe','ml64.exe') {
+            if (Test-Path (Join-Path $bin $t)) { "OK   $t" } else { "MISS $t" }
+          }
+
+          # nushell forces +crt-static, so these three decide whether it can link at all.
+          $missing = @()
+          foreach ($lib in 'libcmt.lib','libvcruntime.lib') {
+            $hit = Get-ChildItem "$inst\VC\Tools\MSVC\$ver\lib\x64\$lib" -ErrorAction SilentlyContinue
+            if ($hit) { "OK   $lib" } else { "MISS $lib"; $missing += $lib }
+          }
+          $ucrt = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Lib\*\ucrt\x64\libucrt.lib" -ErrorAction SilentlyContinue
+          if ($ucrt) { "OK   libucrt.lib -> $($ucrt[0].FullName)" } else { "MISS libucrt.lib"; $missing += 'libucrt.lib' }
+          if ($missing.Count) { throw "static CRT incomplete: $($missing -join ', ')" }
+
+          $rc = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\rc.exe" -ErrorAction SilentlyContinue
+          if ($rc) { "OK   rc.exe -> $($rc[0].FullName)" } else { "MISS rc.exe" }
+
+      - name: Native build deps (bindgen, cmake, ninja, vcpkg, nasm)
+        shell: pwsh
+        run: |
+          foreach ($t in 'cmake','ninja','clang','nasm','perl','go') {
+            $c = Get-Command $t -ErrorAction SilentlyContinue
+            if ($c) { "OK   $t -> $($c.Source)" } else { "MISS $t" }
+          }
+          # bindgen / clang-sys need libclang at runtime.
+          foreach ($d in "${env:ProgramFiles}\LLVM\bin", "${env:ProgramFiles(x86)}\LLVM\bin") {
+            if (Test-Path "$d\libclang.dll") { "OK   libclang.dll -> $d" }
+          }
+          "VCPKG_ROOT=$env:VCPKG_ROOT"
+          rustup --version
+          rustup show
+          cargo --version
+
+      - name: Prove +crt-static actually links
+        shell: pwsh
+        run: |
+          $d = Join-Path $env:RUNNER_TEMP 'crtstatic'
+          cargo new --bin $d --name crtstatic | Out-Null
+          Push-Location $d
+          $env:RUSTFLAGS = '-C target-feature=+crt-static'
+          cargo build --release --target x86_64-pc-windows-msvc
+          if ($LASTEXITCODE -ne 0) { throw "+crt-static link FAILED" }
+          "STATIC CRT LINK OK"
+          Pop-Location
+
+      - name: Timed nushell build (compare against 5.10 min baseline)
+        shell: pwsh
+        run: |
+          $sw = [Diagnostics.Stopwatch]::StartNew()
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" build --workspace --all-targets --profile ci
+          if ($LASTEXITCODE -ne 0) { throw "nushell build failed" }
+          "TIMING cargo build = $([math]::Round($sw.Elapsed.TotalMinutes,2)) min on ${{ matrix.host.name }}"
+
+      - name: Disk footprint
+        if: always()
+        shell: pwsh
+        run: |
+          Get-PSDrive -PSProvider FileSystem |
+            Select-Object Name,
+              @{n='UsedGB';e={[math]::Round($_.Used/1GB,1)}},
+              @{n='FreeGB';e={[math]::Round($_.Free/1GB,1)}} |
+            Format-Table
