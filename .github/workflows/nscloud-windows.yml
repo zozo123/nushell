@@ -1,0 +1,93 @@
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+name: nscloud-windows
+
+permissions:
+  contents: read
+
+env:
+  NU_LOG_LEVEL: DEBUG
+  NU_TEST_SKIP_DEPS_BUILD: true
+  NUSHELL_CARGO_PROFILE: ci
+  MAIN_OPTIONS: --workspace --all-targets
+  # NASM is absent from the Namespace Windows image; aws-lc-sys falls back to
+  # its shipped prebuilt objects when this is set.
+  AWS_LC_SYS_PREBUILT_NASM: '1'
+
+# Native Namespace managed runner — ephemeral VM per job, with a cache volume.
+# Compare against the self-hosted numbers on the same repo:
+#   build 403s, test 87s (persistent VM, no cache volume)
+# and against GitHub-hosted windows-latest:
+#   build 877s, test 204s
+jobs:
+  nscloud-windows:
+    name: nushell Windows on managed Namespace runner
+    runs-on:
+      - nscloud-windows-2022-amd64-8x16-with-cache
+      - nscloud-cache-size-50gb
+      - nscloud-cache-tag-nushell-windows-msvc
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Runner identity and cache volume
+        shell: pwsh
+        run: |
+          [System.Environment]::OSVersion.VersionString
+          "whoami          = $(whoami)"
+          "NSC_CACHE_PATH  = $env:NSC_CACHE_PATH"
+          Get-PSDrive -PSProvider FileSystem |
+            Select-Object Name,
+              @{n='FreeGB';e={[math]::Round($_.Free/1GB,1)}} | Format-Table
+          $vs = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $i  = & $vs -latest -products * -property installationPath
+          "VS   = $(& $vs -latest -products * -property displayName)"
+          "MSVC = $((Get-Content "$i\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt").Trim())"
+
+      - name: Cache Rust (Namespace volume)
+        uses: namespacelabs/nscloud-cache-action@v1
+        with:
+          cache: rust
+
+      - name: Verify the cache mounted as a junction
+        shell: pwsh
+        run: |
+          foreach ($p in 'target', "$env:USERPROFILE\.cargo\registry") {
+            if (Test-Path $p) {
+              $i = Get-Item $p -Force
+              $isLink = [bool]($i.Attributes -band [IO.FileAttributes]::ReparsePoint)
+              "{0,-40} reparse={1} target={2}" -f $p, $isLink, $i.Target
+            } else { "$p does not exist yet" }
+          }
+
+      - name: Setup Rust target
+        run: rustup target add x86_64-pc-windows-msvc
+
+      - name: cargo build (timed)
+        shell: bash
+        run: |
+          s=$(date +%s)
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" build $MAIN_OPTIONS --profile ci
+          echo "TIMING build = $(( $(date +%s) - s ))s"
+
+      - name: cargo test (timed)
+        shell: bash
+        run: |
+          s=$(date +%s)
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" test $MAIN_OPTIONS --profile ci
+          echo "TIMING test = $(( $(date +%s) - s ))s"
+
+      - name: Cache footprint
+        if: always()
+        shell: pwsh
+        run: |
+          if ($env:NSC_CACHE_PATH -and (Test-Path $env:NSC_CACHE_PATH)) {
+            $b = (Get-ChildItem $env:NSC_CACHE_PATH -Recurse -Force -EA SilentlyContinue |
+                  Measure-Object Length -Sum).Sum
+            "CACHE USED: $([math]::Round($b/1GB,2)) GB"
+          }
