@@ -1,0 +1,73 @@
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: 'Runner to open a session on'
+        type: choice
+        default: windows-latest
+        options:
+          - windows-latest
+          - nscloud-windows-2022-amd64-8x16
+      prepare:
+        description: 'Build nushell first, so the box is warm when you connect'
+        type: boolean
+        default: false
+
+name: nsc-windows-ssh
+
+permissions:
+  contents: read
+
+# Opens an interactive SSH session on a real Windows CI machine.
+#
+# No secrets are stored anywhere. action-tmate mints an ephemeral session at
+# run time and prints the connect string in the job log; it dies with the job.
+# `limit-access-to-actor: true` restricts the session to the SSH public keys
+# already registered on the GitHub account that dispatched the run, so the
+# connect string alone is not enough for anyone else to get in.
+#
+# Manual dispatch only — a session holds a runner until you exit or it times
+# out, so it must never fire automatically.
+jobs:
+  ssh:
+    name: "ssh (${{ inputs.host }})"
+    runs-on: ${{ inputs.host }}
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Rust Toolchain
+        run: rustup target add x86_64-pc-windows-msvc
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        with:
+          workspaces: ./ -> target
+          cache-all-crates: true
+
+      - name: Warm the build
+        if: inputs.prepare
+        shell: bash
+        env:
+          AWS_LC_SYS_PREBUILT_NASM: '1'
+        run: cargo --config "${{ github.workspace }}/.cargo/ci.toml" build --workspace --profile ci
+
+      - name: Where things live
+        shell: pwsh
+        run: |
+          "workspace = $env:GITHUB_WORKSPACE"
+          "temp      = $env:RUNNER_TEMP"
+          "cache     = $env:NSC_CACHE_PATH  (set only on Namespace)"
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (Test-Path $vswhere) {
+            $inst = & $vswhere -latest -products * -property installationPath
+            "vcvars    = $inst\VC\Auxiliary\Build\vcvarsall.bat x64"
+          }
+
+      - name: Open SSH session
+        uses: mxschmitt/action-tmate@e5c7151931ca95bad1c6f4190c730ecf8c7dde48 # v3.22
+        with:
+          # Only SSH keys already on the dispatching GitHub account may connect.
+          limit-access-to-actor: true
