@@ -1,0 +1,103 @@
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+name: selfhosted-full-ci
+
+permissions:
+  contents: read
+
+# nushell's complete Windows CI leg, run on a Namespace Windows machine via a
+# self-hosted runner. Mirrors .github/workflows/ci.yml's Windows matrix entry
+# step for step — fmt, clippy, build, test, doctest — across the same three
+# workspaces, so this is a like-for-like parity check rather than a smoke test.
+env:
+  NU_LOG_LEVEL: DEBUG
+  NU_TEST_SKIP_DEPS_BUILD: true
+  CLIPPY_OPTIONS: "-D warnings"
+  NUSHELL_CARGO_PROFILE: ci
+  MAIN_OPTIONS: --workspace --all-targets
+  AWS_LC_SYS_PREBUILT_NASM: '1'
+
+jobs:
+  full-ci:
+    name: "full CI (${{ matrix.workspace.name }})"
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace:
+          - name: root
+            path: ./
+            profile: ci
+            skip: []
+          - name: nu-parser/fuzz
+            path: ./crates/nu-parser/fuzz
+            profile: dev
+            skip: [build, test, doctest]
+          - name: nu-path/fuzz
+            path: ./crates/nu-path/fuzz
+            profile: dev
+            skip: [build, test, doctest]
+
+    runs-on: [self-hosted, nsc-windows]
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        run: rustup target add x86_64-pc-windows-msvc
+        working-directory: ${{ matrix.workspace.path }}
+
+      - name: cargo fmt
+        if: ${{ !contains(matrix.workspace.skip, 'fmt') }}
+        working-directory: ${{ matrix.workspace.path }}
+        shell: bash
+        run: |
+          s=$(date +%s)
+          rustup component add rustfmt
+          cargo fmt --all --check
+          echo "TIMING ${{ matrix.workspace.name }} fmt = $(( $(date +%s) - s ))s"
+
+      - name: cargo clippy
+        if: ${{ !contains(matrix.workspace.skip, 'clippy') }}
+        working-directory: ${{ matrix.workspace.path }}
+        shell: bash
+        run: |
+          s=$(date +%s)
+          rustup component add clippy
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" clippy $MAIN_OPTIONS --profile ${{ matrix.workspace.profile }} -- $CLIPPY_OPTIONS
+          echo "TIMING ${{ matrix.workspace.name }} clippy = $(( $(date +%s) - s ))s"
+
+      - name: cargo build
+        if: ${{ !contains(matrix.workspace.skip, 'build') }}
+        working-directory: ${{ matrix.workspace.path }}
+        shell: bash
+        run: |
+          s=$(date +%s)
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" build $MAIN_OPTIONS --profile ${{ matrix.workspace.profile }}
+          echo "TIMING ${{ matrix.workspace.name }} build = $(( $(date +%s) - s ))s"
+
+      - name: cargo test
+        if: ${{ !contains(matrix.workspace.skip, 'test') }}
+        working-directory: ${{ matrix.workspace.path }}
+        shell: bash
+        run: |
+          s=$(date +%s)
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" test $MAIN_OPTIONS --profile ${{ matrix.workspace.profile }}
+          echo "TIMING ${{ matrix.workspace.name }} test = $(( $(date +%s) - s ))s"
+
+      - name: cargo test --doc
+        if: ${{ !contains(matrix.workspace.skip, 'doctest') }}
+        working-directory: ${{ matrix.workspace.path }}
+        shell: bash
+        run: |
+          s=$(date +%s)
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" test --workspace --doc --profile ${{ matrix.workspace.profile }}
+          echo "TIMING ${{ matrix.workspace.name }} doctest = $(( $(date +%s) - s ))s"
+
+      - name: Assert Clean Repo
+        shell: bash
+        run: git diff --quiet && git diff --cached --quiet
