@@ -128,11 +128,39 @@ jobs:
       - name: "DEPS: native crates in the Windows graph"
         shell: bash
         run: |
+          mkdir -p windows-deps
           cargo tree --target x86_64-pc-windows-msvc --edges normal,build --prefix none --workspace 2>/dev/null \
-            | awk '{print $1}' | sort -u > /tmp/win-deps.txt || true
-          echo "total unique crates: $(wc -l < /tmp/win-deps.txt)"
+            | sed 's/ (\*)$//' | awk 'NF' | sort -u > windows-deps/crates-with-versions.txt || true
+          awk '{print $1}' windows-deps/crates-with-versions.txt | sort -u > windows-deps/crate-names.txt
+          echo "unique crate@version: $(wc -l < windows-deps/crates-with-versions.txt)"
+          echo "unique crate names:   $(wc -l < windows-deps/crate-names.txt)"
           echo "--- native / build crates present ---"
-          grep -E '^(aws-lc-sys|ring|cc|cmake|bindgen|clang-sys|libgit2-sys|libsqlite3-sys|libz-sys|lz4-sys|zstd-sys|curl-sys|lmdb-master-sys|psm|nix|openssl-sys)$' /tmp/win-deps.txt || true
+          grep -iE '^(aws-lc-sys|ring|cc|cmake|bindgen|clang-sys|libgit2-sys|libsqlite3-sys|libz-sys|lz4-sys|zstd-sys|curl-sys|lmdb-master-sys|psm|nix|openssl-sys) ' \
+            windows-deps/crates-with-versions.txt | tee windows-deps/native-crates.txt || true
+
+      - name: "DEPS: capture machine toolchain to file"
+        shell: pwsh
+        run: |
+          $out = "windows-deps/machine-toolchain.txt"
+          $lines = @()
+          $lines += "host=${{ matrix.host }}"
+          $lines += [System.Environment]::OSVersion.VersionString
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (Test-Path $vswhere) {
+            $inst = & $vswhere -latest -products * -property installationPath
+            $lines += "VS=$(& $vswhere -latest -products * -property displayName)"
+            $lines += "VSVersion=$(& $vswhere -latest -products * -property installationVersion)"
+            $lines += "VCToolsVersion=$((Get-Content "$inst\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt").Trim())"
+          }
+          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Lib" -Directory -EA SilentlyContinue |
+            ForEach-Object { $lines += "WindowsSDK=$($_.Name)" }
+          foreach ($t in 'cmake','ninja','clang','nasm','perl','go','python','node','git','cargo','rustc') {
+            $c = Get-Command $t -EA SilentlyContinue
+            if ($c) { $lines += "$t=$($c.Source)" }
+          }
+          $lines += "PATH=$env:PATH"
+          $lines | Set-Content $out
+          Get-Content $out | Select-Object -First 12
 
       # ---------- the real CI flow, timed ----------
 
@@ -183,6 +211,15 @@ jobs:
           s=$(date +%s)
           cargo --config "${{ github.workspace }}/.cargo/ci.toml" test --workspace --doc --profile ci
           echo "TIMING doctest = $(( $(date +%s) - s ))s"
+
+      - name: Upload the dependency inventory
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: windows-deps-${{ matrix.host }}
+          path: windows-deps/
+          retention-days: 30
+          if-no-files-found: warn
 
       - name: Disk footprint
         if: always()
