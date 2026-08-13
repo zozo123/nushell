@@ -1,0 +1,250 @@
+; MSVC / VS install roots
+; Windows SDK roots
+
+HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots
+    {0460C87B-7F4C-3170-FAC9-B7A6AE5CE4E9}    REG_SZ    Universal CRT Redistributable x86
+    KitsRoot10    REG_SZ    C:\Program Files (x86)\Windows Kits\10\
+    {B7BC83B0-1A94-0290-4309-820859276E72}    REG_SZ    Windows App Certification Kit x64 x86
+    {B817BAD1-CC9F-940C-FFD8-7543D89B8EB7}    REG_SZ    Windows App Certification Kit x64 (OnecoreUAP) x86
+    {E43BDB72-464A-290B-A51D-537CBBE1CAC8}    REG_SZ    Windows App Certification Kit SupportedApiList x86 x86
+    {5120ED0E-8B54-B212-15E6-EE404FE83E37}    REG_SZ    Windows SDK EULA x86
+    {06671634-35F4-43F1-1B57-68B7CE54E5B3}    REG_SZ    MSI Development Tools x86
+    {F9DDDEF1-BCF0-275F-DE29-9332F1149B79}    REG_SZ    Windows SDK Signing Tools x86
+    {26BD6DC6-3F0F-4C17-A78C-5D06459F39C0}    REG_SZ    Windows SDK Modern Non-Versioned Developer Tools x86
+    {A056CA2A-2AB1-EB1B-1B2E-D49E0C6C8E17}    REG_SZ    Windows IoT Extension SDK x86
+    {FEC52FA9-A866-C884-4AAA-0B15BE793610}    REG_SZ    Universal CRT Tools x86 x86
+    {E8BE09DF-D93B-AE40-FD63-05E5ABEFB6D9}    REG_SZ    Windows SDK for Windows Store Apps Contracts x86
+    {CEC6FB8C-1F94-F7F8-C9F7-EF55CC2A519F}    REG_SZ    Windows SDK for Windows Store Apps x86
+    {572C25BD-AB18-B702-9ED7-6F0CC6821847}    REG_SZ    WinRT Intellisense Desktop - en-us x86
+    {4C150435-9153-456C-C0BE-497D89513B18}    REG_SZ    Windows SDK for Windows Store Apps Tools x86
+    {0343A2EB-5CCA-79B9-18A4-ABD484A97924}    REG_SZ    Universal CRT Extension SDK x86
+    {FED10190-CF54-E72D-7A92-E3F9CA9B7950}    REG_SZ    Windows Desktop Extension SDK x86
+    {AA11F890-8A6F-D292-8A1D-D70710A87852}    REG_SZ    Windows IoT Extension SDK Contracts x86
+    {F4F63553-2774-41A6-C784-7FAC7DF4CAF3}    REG_SZ    Windows Desktop Extension SDK Contracts x86
+    {EB8B0E53-980A-E861-DC85-05240EFA888D}    REG_SZ    WinRT Intellisense IoT - en-us x86
+    {1F507473-1077-3AB8-2E11-C839AE4E27B8}    REG_SZ    Windows Team Extension SDK x86
+    {9FA1715F-2809-3C7D-B9BB-17574DA0AED9}    REG_SZ    Windows Mobile Extension SDK Contracts x86
+    {FB4D4A9B-9E8F-42CB-B08F-AE153FFA31AC}    REG_SZ    Windows SDK Facade Windows WinMD Versioned x86
+    {F251EBD6-9B8C-3876-A422-B4F677BF3766}    REG_SZ    Windows SDK Modern Versioned Developer Tools x86
+    {CFEF5BD7-A03F-DEF3-1707-A31C813F6D14}    REG_SZ    WinAppDeploy x86
+    {A224D569-B07A-8178-A1E4-75DC397C06B2}    REG_SZ    Windows SDK x86
+    {E901323A-7A02-50A8-F4E0-95C4AD8A098F}    REG_SZ    Windows Mobile Extension SDK x86
+    {3EEF5F2A-A2A3-89FC-D7DF-CFE8DEFE4A8F}    REG_SZ    WinRT Intellisense Mobile - en-us x86
+    {368E4D03-5983-1C2C-B42E-1C0C51A935A5}    REG_SZ    Universal CRT Redistributable x86
+    {4D8C14D7-C036-33F2-EFA7-C5CC5F73932B}    REG_SZ    Windows SDK for Windows Store Managed Apps Libs x86
+    {9A2FEE83-D2FB-A48E-52E0-15801042220F}    REG_SZ    Windows Team Extension SDK Contracts x86
+    {7D4D186C-70F0-6990-1792-DAA557B1E010}    REG_SZ    Universal CRT Headers Libraries and Sources x86
+    {AF0CF0ED-D9DA-DFDA-52DD-B3B0FE269640}    REG_SZ    Windows SDK for Windows Store Apps Metadata x86
+    {91306123-946D-452F-3206-A8AB9F8293D6}    REG_SZ    WinRT Intellisense PPI - en-us x86
+    {7E52FE9F-4D3E-9277-0E37-0014C83D4F5E}    REG_SZ    Universal General MIDI DLS Extension SDK x86
+    {5C8B4DA5-62C6-8D4A-F21A-AD4D66FCA8D9}    REG_SZ    WinRT Intellisense UAP - en-us x86
+    {11C0EB4F-A1BA-2068-49A5-F7C242708BA2}    REG_SZ    Windows SDK DirectX x86 Remote x86
+    {96B30005-C36E-07FF-DF27-EEB8199694CD}    REG_SZ    Windows SDK Redistributables x86
+    {2CAA22A5-36FE-21B0-5A67-3BE172FEFF12}    REG_SZ    Windows SDK for Windows Store Apps Libs x86
+    {F738E2CC-E003-B601-F38B-4521ED842C98}    REG_SZ    Windows SDK for Windows Store Apps DirectX x86 Remote x86
+    {CB91C4E7-9C14-6ABD-566B-DF4593456102}    REG_SZ    Windows SDK for Windows Store Apps Headers OnecoreUap x86
+    {B5534577-4F61-73AC-FFCB-91B0B0674DA4}    REG_SZ    Windows SDK for Windows Store Apps Headers x86
+    {3120663A-4F7D-252C-2829-1B9DBEDFEEED}    REG_SZ    WinRT Intellisense IoT - Other Languages x86
+    {099E916C-D17E-7E1A-0046-3AD1D042102F}    REG_SZ    WinRT Intellisense UAP - Other Languages x86
+    {9BA10CCD-7064-7FAB-B48B-C7B2CCFC60FB}    REG_SZ    WinRT Intellisense PPI - Other Languages x86
+    {EA88E7B4-C204-CC0C-FC10-D13FC9C30800}    REG_SZ    WinRT Intellisense Desktop - Other Languages x86
+    {EFF12E8F-5027-FE5D-6ABF-5F837F3B70F8}    REG_SZ    Windows SDK OnecoreUap Headers x86 x86
+    {D0772A8A-6AB2-E6E1-8BEF-29F59AB99893}    REG_SZ    Windows SDK Desktop Headers x86 x86
+    {DB72537E-BD30-364B-6A72-09CE78DB8321}    REG_SZ    Windows SDK Desktop Tools x86 x86
+    {9EE92E02-FA29-DF43-7E45-A256139DEBE4}    REG_SZ    Windows SDK Desktop Libs x86 x86
+    {EB362CC9-F0B3-EDBC-82E8-91F6BBF36F6E}    REG_SZ    Windows SDK Desktop Tools x64 x86
+    {12C6754C-2086-9BFC-1292-FA0BE54009E6}    REG_SZ    Windows SDK Desktop Libs x64 x86
+    {CCEEC7A2-2179-C5D0-60E2-2651993A8AD5}    REG_SZ    Windows SDK Desktop Headers x64 x86
+    {80F76A51-EAF7-DA8E-C732-B26C591BCC23}    REG_SZ    Windows SDK OnecoreUap Headers x64 x86
+    {7C1561F8-C963-0AC7-21BD-EA4DD9633C50}    REG_SZ    Windows SDK Desktop Tools arm64 x86
+    {0A1B70B0-DD98-1BCC-6958-D5AD8BBAF2B2}    REG_SZ    Windows SDK Desktop Headers arm64 x86
+    {2C37C218-88FF-9E58-0151-1AF693535792}    REG_SZ    Windows SDK Desktop Libs arm64 x86
+    {575077AC-CCC1-9943-6F3C-EDB6149964E7}    REG_SZ    Windows SDK ARM64 Desktop Tools x86
+    {85F3FF9F-CFBA-AD2F-85E2-90571032D412}    REG_SZ    Windows SDK OnecoreUap Headers arm64 x86
+    {E93670D9-924A-7B6F-5F55-AE8E3043BCB0}    REG_SZ    SDK ARM64 Additions x86
+    {AA86DFC1-17A2-6133-1D55-92818B9D3082}    REG_SZ    SDK ARM64 Redistributables x86
+    {8DD472FF-83E3-4FFA-1B97-FF8203690959}    REG_SZ    WPTx64 (OnecoreUAP) x86
+    {CA4D7166-C5DB-98C1-FFED-A4A74B2DDE93}    REG_SZ    WPTx64 (DesktopEditions) x86
+    WindowsDebuggersRoot10    REG_SZ    C:\Program Files (x86)\Windows Kits\10\Debuggers\
+    {F05407CE-F0DF-7EA0-EDBD-AE1055875004}    REG_SZ    WPT Redistributables x86
+    {1B9DE5A3-4B45-E518-3E41-ED155A646D8F}    REG_SZ    Windows SDK EULA x86
+    {6F03AE03-2D20-0681-A104-133BEAC8956D}    REG_SZ    MSI Development Tools x86
+    {ED8E386F-E3AB-9A0B-55E5-8BF791D9534B}    REG_SZ    Windows SDK Signing Tools x86
+    {39EBF327-9F05-795D-3D71-25F5210D85D4}    REG_SZ    Windows IoT Extension SDK x86
+    {0E336D71-64EA-A481-76B8-37CB7C5630EE}    REG_SZ    Windows SDK for Windows Store Apps Contracts x86
+    {09DF0CB1-7ED5-524F-A208-A121D90026F2}    REG_SZ    WinRT Intellisense Desktop - en-us x86
+    {DB0A2082-E91C-2D58-7D65-19113BEDB221}    REG_SZ    Windows SDK for Windows Store Apps Tools x86
+    {C77D7BE2-B9B7-B6D5-5DFF-35CB6601C91B}    REG_SZ    Universal CRT Extension SDK x86
+    {61CA8D3B-6426-D9E3-91CB-1706839276BE}    REG_SZ    Windows Desktop Extension SDK x86
+    {DF85874C-C242-8352-7F7F-AC98ED102311}    REG_SZ    Windows IoT Extension SDK Contracts x86
+    {B73B126E-2832-752B-C24D-B50D236DF1CA}    REG_SZ    Windows Desktop Extension SDK Contracts x86
+    {4FB9BC8B-7686-D7EF-36C3-CAC0D97B5C9B}    REG_SZ    WinRT Intellisense IoT - en-us x86
+    {E6EE1604-474D-770E-B5FF-C55D709C734E}    REG_SZ    Windows Team Extension SDK x86
+    {ADD6795C-1115-DFF1-3932-E044F98D97CA}    REG_SZ    Windows Mobile Extension SDK Contracts x86
+    {C47FC21E-F496-4817-95A3-1A12B51A6E69}    REG_SZ    Windows SDK Facade Windows WinMD Versioned x86
+    {A5980723-EA0A-9FF0-2F17-D3CA231D037C}    REG_SZ    Windows SDK Modern Versioned Developer Tools x86
+    {B9DFA002-E65B-570D-4FB4-70F5D0EE154B}    REG_SZ    WinAppDeploy x86
+    {A7FD5BDD-07E5-963E-B442-0DA8738EF18D}    REG_SZ    Windows Mobile Extension SDK x86
+    {D2BB0F30-BAED-4B44-5DBA-4D34B6068C51}    REG_SZ    WinRT Intellisense Mobile - en-us x86
+    {6B9089CB-51B0-1F55-CED4-B6E0DE9FA6F2}    REG_SZ    Universal CRT Redistributable x86
+    {28AF0D1C-2092-E950-2208-FBB43F8092AD}    REG_SZ    Windows SDK for Windows Store Managed Apps Libs x86
+    {9BB3D482-022F-1105-BE47-84A933EBEE79}    REG_SZ    Windows Team Extension SDK Contracts x86
+    {E46FFDDB-220B-543F-63E4-4C31EAE2B3EA}    REG_SZ    Universal CRT Headers Libraries and Sources x86
+    {04259A4C-FF76-FAFB-20B2-6BA2FB589796}    REG_SZ    Windows SDK for Windows Store Apps Metadata x86
+    {55D6DA01-BE83-67C7-346E-043EA81DC932}    REG_SZ    WinRT Intellisense PPI - en-us x86
+    {8D9EB659-EE43-64F8-B490-F0980DF823A2}    REG_SZ    Universal General MIDI DLS Extension SDK x86
+    {398A9EE2-B2AF-DC5B-19D0-B6093A861C5A}    REG_SZ    WinRT Intellisense UAP - en-us x86
+    {538F2EF7-8807-5E59-3621-E606FE025D15}    REG_SZ    Windows SDK for Windows Store Apps Libs x86
+    {E468D844-27F7-3DFA-23F0-ABDC2CF555D0}    REG_SZ    Windows SDK for Windows Store Apps DirectX x86 Remote x86
+    {B13573B3-86DE-950D-07DD-71ECE767F8E0}    REG_SZ    Windows SDK for Windows Store Apps Headers x86
+    {C35E2C10-133A-BA91-B44E-890B88561421}    REG_SZ    WinRT Intellisense IoT - Other Languages x86
+    {D4B99AF4-7C7B-6638-CBB0-88259288C0E1}    REG_SZ    WinRT Intellisense UAP - Other Languages x86
+    {00406D62-A9D1-3A17-5808-B92632721F1C}    REG_SZ    WinRT Intellisense PPI - Other Languages x86
+    {F5F3B189-4127-3630-A818-EDA53B73AB63}    REG_SZ    WinRT Intellisense Desktop - Other Languages x86
+    {293DAAA3-1A33-3825-B6A7-6C9A7FC8F847}    REG_SZ    Windows SDK Desktop Headers x86 x86
+    {884234AF-FE4E-3B81-B758-C38EB045C832}    REG_SZ    Windows SDK Desktop Tools x86 x86
+    {EE2F89EC-0FED-CF05-46E5-9EFE9715FC66}    REG_SZ    Windows SDK Desktop Libs x86 x86
+    {2DBDB095-D491-1983-F74F-EF988CA60CF7}    REG_SZ    Windows SDK Desktop Tools x64 x86
+    {A82C1991-2667-0151-896F-C92C3FCD8AA1}    REG_SZ    Windows SDK Desktop Libs x64 x86
+    {1F079CA3-A855-D075-2DBD-013FDCE1A711}    REG_SZ    Windows SDK Desktop Headers x64 x86
+    {DD312DEC-9A32-8DB3-6D7B-499F084D4C6B}    REG_SZ    Windows SDK Desktop Libs arm x86
+    {8A4F839F-89EC-EF7E-EE73-07D4E02CC63B}    REG_SZ    Windows SDK Desktop Headers arm x86
+    {32F2F158-3261-006E-5AA6-62A927EEBB29}    REG_SZ    Windows SDK ARM Desktop Tools x86
+    {58A9FF8E-CABC-BE66-9588-78430B054EDA}    REG_SZ    Windows SDK Desktop Tools arm64 x86
+    {5FC776BD-E780-F34A-2BCA-F6BABF7699B2}    REG_SZ    Windows SDK Desktop Headers arm64 x86
+    {0503A374-8AB6-5702-BA17-BCE21EE33103}    REG_SZ    Windows SDK Desktop Libs arm64 x86
+    {E2037558-0217-B40C-F00C-07FDBB82347B}    REG_SZ    Windows SDK EULA x86
+    {4CDB315B-7D34-AADB-B87D-9C00F56A430D}    REG_SZ    MSI Development Tools x86
+    {2BCF4E86-E0B2-C9E0-10DC-26935253CF3D}    REG_SZ    Windows SDK Signing Tools x86
+    {80A87973-098D-8903-956C-3244FC0461A1}    REG_SZ    Windows SDK for Windows Store Apps Metadata x86
+    {A8E49937-CC70-12A0-8B88-22A2AE629655}    REG_SZ    Windows SDK for Windows Store Apps Tools x86
+    {6293EB7C-9B82-5D3F-016A-87D94E8C8E85}    REG_SZ    Windows SDK Modern Versioned Developer Tools x86
+    {532B792A-577A-C684-3BE0-8266D973A314}    REG_SZ    WinAppDeploy x86
+    {EDD486C3-91EA-0B4E-2618-4F4885CC6945}    REG_SZ    Windows SDK for Windows Store Managed Apps Libs x86
+    {911F65D7-229E-FDF5-2CDC-7A778E965FAB}    REG_SZ    Windows SDK for Windows Store Apps Contracts x86
+    {DE56820F-73F3-83D6-DA12-CEF0E7585FDD}    REG_SZ    Windows SDK Facade Windows WinMD Versioned x86
+    {D2C85BA9-DA49-E2D5-D4C2-351C6C2C616F}    REG_SZ    Universal General MIDI DLS Extension SDK x86
+    {8FB7909F-7079-FECC-1A06-B90A324C11E9}    REG_SZ    Universal CRT Redistributable x86
+    {6D7ACCE0-E08A-78C8-2EF5-63E9FAEA185C}    REG_SZ    Universal CRT Headers Libraries and Sources x86
+    {17FAE644-5409-EA4F-91AE-B4F213FB087B}    REG_SZ    WinRT Intellisense UAP - en-us x86
+    {0C75EFBC-6D0C-7516-AE74-4F9FADE79EA2}    REG_SZ    WinRT Intellisense Mobile - en-us x86
+    {78F26630-7E77-27FD-1780-651E8B0EF32A}    REG_SZ    WinRT Intellisense Desktop - en-us x86
+    {D09F9C76-321B-88B7-316B-E655F86BDB37}    REG_SZ    WinRT Intellisense IoT - en-us x86
+    {ED40E403-CBE8-0CA3-5662-E8859CBFA1C0}    REG_SZ    WinRT Intellisense PPI - en-us x86
+    {C3D2FB47-9403-6F43-621C-5E5141B41EDA}    REG_SZ    Windows IoT Extension SDK Contracts x86
+    {12A505CB-AA40-378D-854F-E2CF6A7FF75F}    REG_SZ    Windows IoT Extension SDK x86
+    {A5B25F16-0699-7F93-9154-D749B6037381}    REG_SZ    Windows Team Extension SDK x86
+    {47B777FC-0E69-8326-B50D-FEAB5995B4D6}    REG_SZ    Windows Team Extension SDK Contracts x86
+    {DF4C943F-A46A-E489-69CE-189C54B0487E}    REG_SZ    Windows Mobile Extension SDK Contracts x86
+    {D97824BC-1F9C-9A98-A458-5B0D06ECB755}    REG_SZ    Windows Mobile Extension SDK x86
+    {2D78CDCA-CE1A-6007-089C-E09908F8B1FD}    REG_SZ    Universal CRT Extension SDK x86
+    {D721DCB8-0930-F41C-6110-A00C41A0D32C}    REG_SZ    Windows Desktop Extension SDK Contracts x86
+    {16E355AC-58E7-65EE-794A-96ACB540AEA1}    REG_SZ    Windows Desktop Extension SDK x86
+    {9AE69F25-AAA9-19CA-A490-FD002EF55FB0}    REG_SZ    Windows SDK for Windows Store Apps Headers x86
+    {8A69A3F8-0D09-7AEC-714B-21F63FD4F131}    REG_SZ    Windows SDK for Windows Store Apps Libs x86
+    {AF19AD5B-2DF6-9862-B161-26B5BDB6D8EE}    REG_SZ    Windows SDK for Windows Store Apps DirectX x86 Remote x86
+    {B9369888-3610-E674-C077-322D40A10123}    REG_SZ    WinRT Intellisense UAP - Other Languages x86
+    {2D57E5F2-DE65-816E-0AB4-58E046C34205}    REG_SZ    WinRT Intellisense Desktop - Other Languages x86
+    {EC30B4D9-09E0-D607-CA2D-05EFE8F39C53}    REG_SZ    WinRT Intellisense IoT - Other Languages x86
+    {EE47B659-7AF5-9302-D4A4-3204070DB9C6}    REG_SZ    WinRT Intellisense PPI - Other Languages x86
+    {A309246D-0781-212D-1424-4A6505425A44}    REG_SZ    Windows SDK Desktop Headers x86 x86
+    {842FBFC4-CCCC-6799-1998-17DED2BCE174}    REG_SZ    Windows SDK Desktop Libs x86 x86
+    {0A2BCE78-63A3-9F82-AD76-17C310B3EAEF}    REG_SZ    Windows SDK Desktop Tools x86 x86
+    {A3B7C26F-BE21-6D16-77CA-BD5F1394A538}    REG_SZ    Windows SDK Desktop Headers x64 x86
+    {E22D77C1-306A-C916-15A0-08189F27E575}    REG_SZ    Windows SDK Desktop Libs x64 x86
+    {2A0C6A0D-A8A7-89B6-AA43-B5DF54E1E837}    REG_SZ    Windows SDK Desktop Tools x64 x86
+    {8BE03D0F-0D5D-67F0-B04C-EC13A64C4BAC}    REG_SZ    Windows SDK Desktop Headers arm x86
+    {CE78C7EF-312F-35EB-82F9-FDC326F08658}    REG_SZ    Windows SDK Desktop Libs arm x86
+    {FB88CFF1-D06D-72C3-0887-53277E92DAD2}    REG_SZ    Windows SDK ARM Desktop Tools x86
+    {2825810D-881C-9FBB-7836-B0117552064F}    REG_SZ    Windows SDK Desktop Tools arm64 x86
+    {27B3D59D-9D54-3EA4-4CCE-AE5E57918284}    REG_SZ    Windows SDK Desktop Headers arm64 x86
+    {CA8A9642-147B-190E-76A3-87A23B97ADF9}    REG_SZ    Windows SDK Desktop Libs arm64 x86
+    {8BFBEC30-33CC-13B4-849F-3B036F27466A}    REG_SZ    Universal CRT Headers Libraries and Sources x86
+    {1FBCBC17-4527-2340-0832-B1D49C41FF67}    REG_SZ    Universal CRT Extension SDK x86
+    {2DD06060-C61D-7C3A-AA55-6E3FD9493D61}    REG_SZ    Windows SDK EULA x86
+    {58770E7F-37C0-70F9-6CBF-2B18503B0EE0}    REG_SZ    Windows SDK Signing Tools x86
+    {A128C4CE-88C8-8BDF-FBE9-A517979E0BDD}    REG_SZ    Windows SDK for Windows Store Apps Metadata x86
+    {BA610F2C-C1FA-0A65-2B4D-8272223AC061}    REG_SZ    Windows SDK for Windows Store Apps Tools x86
+    {C1C8121A-6BDE-478E-3685-C09F9287D6F0}    REG_SZ    Windows SDK Modern Versioned Developer Tools x86
+    {716AE8F2-1BE3-7657-DF6B-F23DEEC75AF9}    REG_SZ    WinAppDeploy x86
+    {9A0DC6A1-E91D-EB94-FB4D-41DDDE8A225D}    REG_SZ    Windows SDK for Windows Store Managed Apps Libs x86
+    {36AA7E63-76E9-E591-C985-272415268810}    REG_SZ    Windows SDK for Windows Store Apps Contracts x86
+    {CA7A8A65-AB2E-43AA-4110-10C50115E211}    REG_SZ    Windows SDK Facade Windows WinMD Versioned x86
+    {CE83D0BD-418A-F3D1-D6CE-687E96D1EBD0}    REG_SZ    Universal General MIDI DLS Extension SDK x86
+    {5F577A45-3C65-352B-061D-D6A57F05402C}    REG_SZ    Universal CRT Redistributable x86
+    {CB19DBA2-C210-5646-9522-695A1317CD34}    REG_SZ    Universal CRT Headers Libraries and Sources x86
+    {B047C746-63E8-41C7-A5C0-7ABD390CF3E6}    REG_SZ    WinRT Intellisense UAP - en-us x86
+    {F6F11150-93DE-0507-FCA0-F746E0207017}    REG_SZ    WinRT Intellisense Mobile - en-us x86
+    {00B12DF9-5428-9406-DE2C-8E8A1A062B05}    REG_SZ    WinRT Intellisense Desktop - en-us x86
+    {7E898893-9C42-A572-7F57-FDE55CE812F7}    REG_SZ    WinRT Intellisense IoT - en-us x86
+    {8329C3A0-8582-D1C2-67FF-800654BFDF45}    REG_SZ    WinRT Intellisense PPI - en-us x86
+    {AC8F20B3-36BB-DE22-CA37-43BC967B3F47}    REG_SZ    Windows IoT Extension SDK Contracts x86
+    {110B5402-97D4-DDA2-7B42-665D8325A44F}    REG_SZ    Windows IoT Extension SDK x86
+    {A8B548F5-D495-BB71-F673-2D48FD7E764C}    REG_SZ    Windows Team Extension SDK x86
+    {F57D8118-1428-ECB8-0729-A577A9A1DEA8}    REG_SZ    Windows Team Extension SDK Contracts x86
+    {6FF4EDB8-56EA-640C-47CA-54C845F7D273}    REG_SZ    Windows Mobile Extension SDK Contracts x86
+    {B38CF8FF-C0D9-B11D-6484-B95A81C72DDC}    REG_SZ    Windows Mobile Extension SDK x86
+    {7D225043-6CC5-7B56-11DD-AFF90E4C1C0C}    REG_SZ    Universal CRT Extension SDK x86
+    {942262C5-DA88-830D-7140-C5BCC896DD60}    REG_SZ    Windows Desktop Extension SDK Contracts x86
+    {EC74C9E5-A88F-D4DF-1DD0-FA42FFBB298D}    REG_SZ    Windows Desktop Extension SDK x86
+    {785711EA-DD49-D232-BB29-D48350CC458F}    REG_SZ    Windows SDK for Windows Store Apps Headers x86
+    {DAED8629-A799-B67F-9751-F3A1C60EE335}    REG_SZ    Windows SDK for Windows Store Apps Libs x86
+    {929C5E30-584A-9E44-2C03-08AA27927317}    REG_SZ    Windows SDK for Windows Store Apps DirectX x86 Remote x86
+    {0063AF94-397B-9C64-1C71-D404B27C5D96}    REG_SZ    WinRT Intellisense UAP - Other Languages x86
+    {E82A4A6C-C21C-35FE-B805-3E44318F6D63}    REG_SZ    WinRT Intellisense Desktop - Other Languages x86
+    {E8B1CB29-5C24-D882-3CEF-F8A7263BC63D}    REG_SZ    WinRT Intellisense IoT - Other Languages x86
+    {771C9DEF-7C0B-85DA-6426-7A20F06BEC94}    REG_SZ    WinRT Intellisense PPI - Other Languages x86
+    {C971A14A-F045-BD6A-C670-05C7B74A37FE}    REG_SZ    Windows SDK Desktop Headers x86 x86
+    {D5B8B2F7-680B-B6D4-6353-377C73C0F8A8}    REG_SZ    Windows SDK Desktop Libs x86 x86
+    {F770E8F3-139B-0373-8692-BF619445B8C2}    REG_SZ    Windows SDK Desktop Tools x86 x86
+    {492AAE4A-619E-64BF-6173-DB4E25D67533}    REG_SZ    Windows SDK Desktop Headers x64 x86
+    {AE5CE40F-6C6D-C95F-FD37-D9EF7093CA99}    REG_SZ    Windows SDK Desktop Libs x64 x86
+    {8308EFA9-D647-6BF4-6525-349091FBD528}    REG_SZ    Windows SDK Desktop Tools x64 x86
+    {BFC2CA21-326B-90D1-B0E5-F1327411D4A5}    REG_SZ    Windows SDK Desktop Headers arm x86
+    {323350A8-D3DC-2F8C-2976-E59E2C132B74}    REG_SZ    Windows SDK Desktop Libs arm x86
+    {EA15DC17-4379-6850-16FA-D6527641A8DD}    REG_SZ    Windows SDK ARM Desktop Tools x86
+    {9D5486B4-7458-1A53-E92F-8CFD4AF85D4B}    REG_SZ    Windows SDK Desktop Tools arm64 x86
+    {441FA049-A2AB-7E8D-375D-5C9720CD3325}    REG_SZ    Windows SDK Desktop Headers arm64 x86
+    {51ACC3C5-D131-0916-3F0C-59455F32E6B0}    REG_SZ    Windows SDK Desktop Libs arm64 x86
+    {0C0901E6-B1B0-4BDC-054C-0ABD06C863DE}    REG_SZ    Windows Debugging WDK Integration Versioned x86
+    {DCFE68C7-EC29-1E76-422F-6BE73FB80A40}    REG_SZ    Windows Driver Kit x86
+    {9018A68C-3D69-E95B-70DC-E1DD4441EA07}    REG_SZ    Windows Deployment Image Servicing and Management Tools (OnecoreUAP) x86
+    {18850A16-8391-8484-98B9-790299196F81}    REG_SZ    OA3Tool x86
+    {64842450-7BDB-0C5E-5382-F92C6F4DAAAA}    REG_SZ    Windows Driver Kit Binaries x86
+    WdkBinRootVersioned    REG_SZ    C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\
+    {3FB95BD0-ADFC-318D-5933-E69D5348C43A}    REG_SZ    Windows Driver Kit Headers and Libs x86
+    {92785CDE-BD4A-6B24-82C4-B489C60D0CD3}    REG_SZ    Windows Driver Framework Headers and Libs OnecoreUAP x86
+    {6C8A48E8-3390-D8C2-3D15-A5016DE6EB8F}    REG_SZ    Windows Driver Kit SxS Content x86
+    {C61E9614-6A48-3CD6-B6F4-60C6D1F50C43}    REG_SZ    OEM Test Certificates (OnecoreUAP) x86
+    {E099F57C-12C7-F124-345D-2F6B2C86A6FE}    REG_SZ    OneCoreUap_WDTF_Headers_and_Libs_Kit_Content x86
+    {065898D1-CE79-5DE6-3547-739F117EB3ED}    REG_SZ    Windows Driver Kit Logger x86
+    {09F4695E-B067-8117-7AE1-02B8251FBDBC}    REG_SZ    OneCoreUap_ApiValidator_WDK_Kit_Content x86
+    {24362E1D-830E-72BF-AF9D-3D603EF3DADE}    REG_SZ    Windows Content Versioned x86
+    {5C230C71-7057-E290-68DD-CCB72ED3DBE4}    REG_SZ    Windows Tools Versioned x86
+    {73C69D93-8035-3BCD-1B4B-251CAD5D6870}    REG_SZ    Network Monitor Parsers x86
+    {ADAA022A-ACED-9FE4-59DE-E16B35199715}    REG_SZ    Windows OEM Preproduction Desktop Policies) x86
+    {E9DF0566-F84A-78B1-C8B4-8C8F4C92233D}    REG_SZ    Enable UEFI SecureBoot Tool x86
+    {425F7B71-9D13-5657-20AB-E8838CC23438}    REG_SZ    Windows Driver Kit Headers and Libs OnecoreUAP x86
+    {EFEE51E6-C414-6E78-9D1C-54844FAA4E43}    REG_SZ    Windows Driver Kit Binaries OnecoreUAP x86
+    {945753F3-0557-432B-C389-E928FEABBA78}    REG_SZ    Supply Chain Trust Tools WDK x86
+    {0BE00B2F-8391-E611-FE2A-3B7C5442C29B}    REG_SZ    OneCoreUap_DrvCat_WDK_Kit_Content x86
+    {C8D4F958-8E73-8C4D-95C1-36F1494E2801}    REG_SZ    Windows Driver Kit ARM64 Additions x86
+    {F6C5BC04-7C74-90E8-C1A9-1E32650FDEC6}    REG_SZ    Windows Driver Kit ARM64 Binaries x86
+    {905DE2B1-861F-A173-F6B7-2982A1703A12}    REG_SZ    Windows Driver Kit ARM64 Headers and Libs x86
+    {FCE84562-62A7-7FE1-D147-8DAA93E5B133}    REG_SZ    Windows Driver Framework ARM64 Headers and Libs OnecoreUAP x86
+    {355F2B9E-D01E-0201-D7F9-0C1DC5AB9211}    REG_SZ    Windows Driver Kit ARM64 Headers and Libs OnecoreUAP x86
+    {A9062E62-C8A4-9760-3E76-3FEB7760F626}    REG_SZ    Windows Driver Kit Root Dev17 Content x86
+    {D0F6415C-DAF6-CB99-7F08-DE45D4422F3E}    REG_SZ    Windows Driver Kit Downlevel Dev14 Content x86
+    {06E6E0E8-B224-A248-0AC9-EAE339FF8445}    REG_SZ    Windows SDK ARM64 Headers Libs Metadata x86
+    {D5695B18-E723-74E3-A6BF-6A2BA1940CB3}    REG_SZ    SDK Debuggers ARM64 x86
+    {275F682A-C200-96C4-27A3-6D7487EA6370}    REG_SZ    Kits Configuration Installer x86
+
+HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots\10.0.17763.0
+HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots\10.0.19041.0
+HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots\10.0.22621.0
+HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots\10.0.26100.0
+; .NET
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full
+    Release    REG_DWORD    0x8234d
+
