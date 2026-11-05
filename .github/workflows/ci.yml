@@ -40,6 +40,7 @@ jobs:
       cargo-options: --workspace --all-targets
       profile: ci
     strategy:
+      fail-fast: false
       matrix:
         platform: &platforms
           - name: Linux
@@ -106,21 +107,25 @@ jobs:
           --profile ${{ env.profile }}
 
       - name: Profile kitest timings
+        if: runner.os == 'Linux'
+        continue-on-error: true
         working-directory: ${{ env.working-directory }}
-        # MEAS-ONLY: re-run major kitest suites with harness --report-time (stable-safe).
-        # Do not pass --report-time to cargo test --workspace (libtest rejects it on stable).
+        # MEAS-ONLY: re-run the heaviest kitest suites with harness --report-time (stable-safe).
+        # Linux-only to avoid filling the disk by re-running the suite on every OS.
         run: |
-          set -euo pipefail
+          set -u
           profile="${{ env.profile }}"
           cfg=(--config "${{ github.workspace }}/.cargo/ci.toml")
-          for spec in             "-p nu --test tests"             "-p nu-command --test tests"             "-p nu-cli --test tests"             "-p nu-cmd-extra --test tests"             "-p nu-tui --test tests"             "-p nu-dap --test tests"             "-p nu-protocol --test tests"             "-p nu-color-config --test tests"
+          for spec in \
+            "-p nu --test tests" \
+            "-p nu-command --test tests" \
+            "-p nu-tui --test tests"
           do
             echo "::group::kitest profile ${spec}"
             # shellcheck disable=SC2086
-            cargo "${cfg[@]}" test ${spec} --profile "${profile}" -- --report-time
+            cargo "${cfg[@]}" test ${spec} --profile "${profile}" -- --report-time || echo "profile failed for ${spec}"
             echo "::endgroup::"
           done
-
       - &step_doctest
         name: Doctest
         working-directory: ${{ env.working-directory }}
@@ -234,6 +239,7 @@ jobs:
       profile: dev
       cargo-options: --all-targets
     strategy:
+      fail-fast: false
       matrix:
         platform: *platforms
         crate:
