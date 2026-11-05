@@ -72,11 +72,12 @@ jobs:
               sudo apt-get install -y clang mold
               ;;
             Windows)
-              # lld-link ships with the MSVC/LLVM components on windows-2022 images via llvm
-              if ! command -v lld-link >/dev/null 2>&1; then
-                choco install llvm -y --no-progress || true
+              # Prefer lld-link when present; do not override existing rustflags from config.toml.
+              if command -v lld-link >/dev/null 2>&1 || where lld-link >/dev/null 2>&1; then
+                echo "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=lld-link" >> "$GITHUB_ENV"
+              else
+                echo "lld-link not on PATH; keeping default Windows linker"
               fi
-              where lld-link || echo "lld-link not found; cargo may fall back"
               ;;
             macOS)
               echo "keeping default macOS linker"
