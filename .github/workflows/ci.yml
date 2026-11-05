@@ -40,6 +40,7 @@ jobs:
       cargo-options: --workspace --all-targets
       profile: ci
     strategy:
+      fail-fast: false
       matrix:
         platform: &platforms
           - name: Linux
@@ -218,6 +219,7 @@ jobs:
       profile: dev
       cargo-options: --all-targets
     strategy:
+      fail-fast: false
       matrix:
         platform: *platforms
         crate:
