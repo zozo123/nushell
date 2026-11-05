@@ -7,6 +7,7 @@ on:
       - 'patch-release-*'
 
 name: Continuous Integration
+# MEAS-ONLY: GitHub-hosted runners for fork timing. Do not merge to upstream.
 
 permissions:
   contents: read
@@ -42,14 +43,14 @@ jobs:
       matrix:
         platform: &platforms
           - name: Linux
-            runner: &runner_linux incredibuild-ubuntu-2204
+            runner: &runner_linux ubuntu-24.04
             target: &target_linux x86_64-unknown-linux-gnu
           - name: Windows
-            runner: &runner_windows incredibuild-windows-2022
+            runner: &runner_windows windows-2022
             target: &target_windows x86_64-pc-windows-msvc
           - name: MacOS
-            runner: &runner_macos incredibuild-macos-latest
-            target: &target_macos x86_64-apple-darwin
+            runner: &runner_macos macos-14
+            target: &target_macos aarch64-apple-darwin
     steps:
 
       - &step_checkout_repo
