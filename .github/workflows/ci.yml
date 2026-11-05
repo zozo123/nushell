@@ -62,6 +62,27 @@ jobs:
         run: rustup target add ${{ env.build-target }}
         working-directory: ${{ env.working-directory }}
 
+      - &step_setup_fast_linker
+        name: Setup Fast Linker
+        shell: bash
+        run: |
+          case "${{ runner.os }}" in
+            Linux)
+              sudo apt-get update
+              sudo apt-get install -y clang mold
+              ;;
+            Windows)
+              # lld-link ships with the MSVC/LLVM components on windows-2022 images via llvm
+              if ! command -v lld-link >/dev/null 2>&1; then
+                choco install llvm -y --no-progress || true
+              fi
+              where lld-link || echo "lld-link not found; cargo may fall back"
+              ;;
+            macOS)
+              echo "keeping default macOS linker"
+              ;;
+          esac
+
       - &step_cache_rust
         name: Cache Rust
         uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
@@ -204,6 +225,7 @@ jobs:
     steps:
       - *step_checkout_repo
       - *step_setup_rust_toolchain
+      - *step_setup_fast_linker
       - *step_cache_rust
       - *step_check
       - *step_build
@@ -227,6 +249,7 @@ jobs:
     steps:
       - *step_checkout_repo
       - *step_setup_rust_toolchain
+      - *step_setup_fast_linker
       - *step_cache_rust
       - *step_fmt
       - *step_check

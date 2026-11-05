@@ -1,3 +1,14 @@
 # allow in CI to depend on `cfg(ci)`
-[target.'cfg(all())']
+# MEAS: per-target rustflags so we can attach faster linkers.
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["--cfg", "ci", "-C", "link-arg=-fuse-ld=mold"]
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["--cfg", "ci", "-C", "linker=lld-link"]
+
+[target.aarch64-apple-darwin]
+rustflags = ["--cfg", "ci"]
+
+[target.wasm32-unknown-unknown]
 rustflags = ["--cfg", "ci"]
