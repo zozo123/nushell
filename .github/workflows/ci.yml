@@ -7,6 +7,7 @@ on:
       - 'patch-release-*'
 
 name: Continuous Integration
+# MEAS-ONLY: GitHub-hosted runners for fork timing. Do not merge to upstream.
 
 permissions:
   contents: read
@@ -42,14 +43,14 @@ jobs:
       matrix:
         platform: &platforms
           - name: Linux
-            runner: &runner_linux incredibuild-ubuntu-2204
+            runner: &runner_linux ubuntu-24.04
             target: &target_linux x86_64-unknown-linux-gnu
           - name: Windows
-            runner: &runner_windows incredibuild-windows-2022
+            runner: &runner_windows windows-2022
             target: &target_windows x86_64-pc-windows-msvc
           - name: MacOS
-            runner: &runner_macos incredibuild-macos-latest
-            target: &target_macos x86_64-apple-darwin
+            runner: &runner_macos macos-14
+            target: &target_macos aarch64-apple-darwin
     steps:
 
       - &step_checkout_repo
@@ -67,33 +68,11 @@ jobs:
         with:
           workspaces: ${{ env.working-directory }} -> target
           cache-all-crates: true
-          cache-workspace-crates: true
+          # Workspace crates are recompiled after an exact cache hit anyway.
+          cache-workspace-crates: false
 
-      - &step_fmt
-        name: Fmt
-        working-directory: ${{ env.working-directory }}
-        run: |
-          rustup component add rustfmt
-          cargo fmt --all --check
-
-      - &step_check
-        name: Check
-        working-directory: ${{ env.working-directory }}
-        run: >-
-          cargo --config "${{ github.workspace }}/.cargo/ci.toml" 
-          check ${{ env.cargo-options }} 
-          --profile ${{ env.profile }}
-
-      - &step_clippy
-        name: Clippy
-        working-directory: ${{ env.working-directory }}
-        run: >-
-          rustup component add clippy
-
-          cargo --config "${{ github.workspace }}/.cargo/ci.toml" 
-          clippy ${{ env.cargo-options }} 
-          --profile ${{ env.profile }} 
-          -- -D warnings
+      # Fmt and Clippy run in the parallel lint job so they stay off the build/test critical path.
+      # Redundant cargo check before Clippy removed (see #19445); WASM keeps an explicit Check.
 
       - &step_build
         name: Build
@@ -170,6 +149,45 @@ jobs:
         shell: bash
         run: test -z "$(git status --porcelain)"
 
+  # Fmt + Clippy on their own runners so root can build/test without waiting on them.
+  lint:
+    name: ${{ matrix.platform.name }} / lint
+    runs-on: ${{ matrix.platform.runner }}
+    if: *job_if
+    env:
+      build-target: ${{ matrix.platform.target }}
+      working-directory: ${{ github.workspace }}
+      cargo-options: --workspace --all-targets
+      profile: ci
+    strategy:
+      matrix:
+        platform: *platforms
+    steps:
+      - *step_checkout_repo
+      - *step_setup_rust_toolchain
+      - *step_cache_rust
+
+      - &step_fmt
+        name: Fmt
+        working-directory: ${{ env.working-directory }}
+        run: |
+          rustup component add rustfmt
+          cargo fmt --all --check
+
+      - &step_clippy
+        name: Clippy
+        env:
+          CARGO_BUILD_WARNINGS: deny
+        working-directory: ${{ env.working-directory }}
+        run: >-
+          rustup component add clippy
+
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml" 
+          clippy ${{ env.cargo-options }} 
+          --profile ${{ env.profile }}
+
+      - *step_assert_clean_repo
+
   root_wasm:
     name: WASM / root
     runs-on: *runner_linux
@@ -204,7 +222,13 @@ jobs:
       - *step_checkout_repo
       - *step_setup_rust_toolchain
       - *step_cache_rust
-      - *step_check
+      - name: Check
+        working-directory: ${{ env.working-directory }}
+        run: >-
+          cargo --config "${{ github.workspace }}/.cargo/ci.toml"
+          check ${{ env.cargo-options }}
+          --profile ${{ env.profile }}
+
       - *step_build
       - *step_assert_clean_repo
 
@@ -228,6 +252,5 @@ jobs:
       - *step_setup_rust_toolchain
       - *step_cache_rust
       - *step_fmt
-      - *step_check
       - *step_clippy
       - *step_assert_clean_repo
