@@ -17,6 +17,7 @@ env:
   NU_LOG_LEVEL: DEBUG
   NU_TEST_SKIP_DEPS_BUILD: true
   NUSHELL_CARGO_PROFILE: ci
+  CARGO_INCREMENTAL: "0"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref && github.ref || github.run_id }}
