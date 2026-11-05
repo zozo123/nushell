@@ -501,8 +501,9 @@ debug = true
 # to analyze performance with tooling like linux perf
 [profile.ci]
 inherits = "dev"
-strip = false
-debug = false
+strip = "debuginfo"
+debug = 0
+incremental = false
 
 # Main nu binary
 [[bin]]
