@@ -68,7 +68,8 @@ jobs:
         with:
           workspaces: ${{ env.working-directory }} -> target
           cache-all-crates: true
-          cache-workspace-crates: true
+          # MEAS: deps-only (workspace members recompiled after exact hits anyway)
+          cache-workspace-crates: false
 
       - &step_fmt
         name: Fmt
