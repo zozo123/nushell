@@ -104,13 +104,18 @@ jobs:
           build ${{ env.cargo-options }} 
           --profile ${{ env.profile }}
 
+      - name: Install nextest
+        uses: taiki-e/install-action@1919c4a95903d2c33e4a221102edca87309fc14b # v2.89.0
+        with:
+          tool: nextest
+
       - &step_test
         name: Test
         working-directory: ${{ env.working-directory }}
         run: >-
           cargo --config "${{ github.workspace }}/.cargo/ci.toml"
-          test ${{ env.cargo-options }}
-          --profile ${{ env.profile }}
+          nextest run ${{ env.cargo-options }}
+          --cargo-profile ${{ env.profile }}
 
       - &step_doctest
         name: Doctest
