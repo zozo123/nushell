@@ -7,6 +7,7 @@ on:
       - 'patch-release-*'
 
 name: Continuous Integration
+# MEAS-ONLY: GitHub-hosted runners for fork timing. Do not merge to upstream.
 
 permissions:
   contents: read
@@ -42,14 +43,14 @@ jobs:
       matrix:
         platform: &platforms
           - name: Linux
-            runner: &runner_linux incredibuild-ubuntu-2204
+            runner: &runner_linux ubuntu-24.04
             target: &target_linux x86_64-unknown-linux-gnu
           - name: Windows
-            runner: &runner_windows incredibuild-windows-2022
+            runner: &runner_windows windows-2022
             target: &target_windows x86_64-pc-windows-msvc
           - name: MacOS
-            runner: &runner_macos incredibuild-macos-latest
-            target: &target_macos x86_64-apple-darwin
+            runner: &runner_macos macos-14
+            target: &target_macos aarch64-apple-darwin
     steps:
 
       - &step_checkout_repo
@@ -60,6 +61,28 @@ jobs:
         name: Setup Rust Toolchain
         run: rustup target add ${{ env.build-target }}
         working-directory: ${{ env.working-directory }}
+
+      - &step_setup_fast_linker
+        name: Setup Fast Linker
+        shell: bash
+        run: |
+          case "${{ runner.os }}" in
+            Linux)
+              sudo apt-get update
+              sudo apt-get install -y clang mold
+              ;;
+            Windows)
+              # Prefer lld-link when present; do not override existing rustflags from config.toml.
+              if command -v lld-link >/dev/null 2>&1 || where lld-link >/dev/null 2>&1; then
+                echo "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=lld-link" >> "$GITHUB_ENV"
+              else
+                echo "lld-link not on PATH; keeping default Windows linker"
+              fi
+              ;;
+            macOS)
+              echo "keeping default macOS linker"
+              ;;
+          esac
 
       - &step_cache_rust
         name: Cache Rust
@@ -203,6 +226,7 @@ jobs:
     steps:
       - *step_checkout_repo
       - *step_setup_rust_toolchain
+      - *step_setup_fast_linker
       - *step_cache_rust
       - *step_check
       - *step_build
@@ -226,6 +250,7 @@ jobs:
     steps:
       - *step_checkout_repo
       - *step_setup_rust_toolchain
+      - *step_setup_fast_linker
       - *step_cache_rust
       - *step_fmt
       - *step_check
