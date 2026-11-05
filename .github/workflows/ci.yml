@@ -104,7 +104,6 @@ jobs:
           cargo --config "${{ github.workspace }}/.cargo/ci.toml"
           test ${{ env.cargo-options }}
           --profile ${{ env.profile }}
-          -- --report-time
 
       - &step_doctest
         name: Doctest
